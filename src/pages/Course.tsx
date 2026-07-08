@@ -18,7 +18,7 @@ export default function Course() {
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
             <div className="flex items-center space-x-1 z-10">
               <Link to="/" className="text-3xl font-serif text-white tracking-wide flex items-start">
-                T<span className="text-xl font-sans mt-0.5 ml-0.5">4</span>rader
+                T<span className="text-xl font-sans mt-0.5 ml-0.5">4</span>Trader
               </Link>
             </div>
 
