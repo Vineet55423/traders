@@ -18,7 +18,7 @@ export default function Course() {
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
             <div className="flex items-center space-x-1 z-10">
               <Link to="/" className="text-3xl font-serif text-white tracking-wide flex items-start">
-                T<span className="text-xl font-sans mt-0.5 ml-0.5">4</span>rader
+                T<span className="text-xl font-sans mt-0.5 ml-0.5">4</span>Trader
               </Link>
             </div>
 
@@ -81,8 +81,11 @@ export default function Course() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className="relative h-full group"
                   >
-                    <GlassCard glow className="flex flex-col h-full bg-white/5 border-white/10 hover:border-primary/50 transition-colors">
+                    <div className="animated-border-box-glow"></div>
+                    <div className="animated-border-box"></div>
+                    <GlassCard glow className="relative z-10 flex flex-col h-full bg-transparent border-0 shadow-none hover:shadow-none hover:border-transparent">
                       <h3 className="text-2xl font-bold mb-2">{course.title}</h3>
                       <p className="text-sm text-gray-400 mb-6 flex-grow">{course.desc}</p>
                       <ul className="space-y-3 mb-8">

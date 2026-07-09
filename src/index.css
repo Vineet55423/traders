@@ -13,6 +13,8 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   margin: 0;
   padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Custom scrollbar to match sleek theme */
@@ -31,4 +33,64 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #32CD32;
+}
+
+/* Glow Border Animation */
+.animated-border-box, .animated-border-box-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; 
+  z-index: -1;
+  border-radius: 16px; /* Match standard rounded-2xl */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.group:hover .animated-border-box,
+.group:hover .animated-border-box-glow {
+  opacity: 1;
+}
+
+.animated-border-box-glow {
+  filter: blur(8px);
+}
+
+.animated-border-box:before, .animated-border-box-glow:before {
+  content: '';
+  z-index: -2;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /* Use our accent color #c9ff00 instead of blue */
+  background-image: conic-gradient(rgba(0,0,0,0), #c9ff00, rgba(0,0,0,0) 25%);
+  animation: rotate 4s linear infinite;
+}
+
+.animated-border-box:after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 2px;
+  top: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  /* Card background matching the theme glass effect */
+  background: #0a110a; 
+  border-radius: 14px;
+}
+
+@keyframes rotate {
+  100% {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
 }
