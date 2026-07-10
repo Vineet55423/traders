@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { GlassCard } from "../components/ui/GlassCard";
 import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
@@ -8,10 +7,38 @@ import { GlitchHoverCard } from "../components/GlitchHoverCard";
 import { MagneticIcon } from "../components/MagneticIcon";
 
 import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+
+console.log(supabase);
 
 export default function Home() {
   const methodRef = useRef<HTMLDivElement>(null);
   const [methodActive, setMethodActive] = useState(false);
+
+  const navigate = useNavigate();
+
+  const [session, setSession] = useState<any>(null);
+  const [showProfile, setShowProfile] = useState(false);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+    };
+
+    getSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -29,6 +56,12 @@ export default function Home() {
 
     return () => observer.disconnect();
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setShowProfile(false);
+    navigate("/");
+  };
 
   return (
     <div
@@ -54,19 +87,70 @@ export default function Home() {
             </div>
 
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-16 bg-white/10 backdrop-blur-md border border-white/10 px-12 py-2.5 rounded-full shadow-lg z-10">
-              <a href="#home" className="text-sm font-medium hover:text-white transition-colors text-white">Home</a>
-              <Link to="/course" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Course</Link>
-              <a href="#team" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Team</a>
-              <a href="#faq" className="text-sm font-medium text-white/70 hover:text-white transition-colors">FAQS</a>
-              <a href="#footer" className="text-sm font-medium text-white/70 hover:text-white transition-colors">About</a>
+              <a
+                href="#home"
+                className="text-sm font-medium hover:text-white transition-colors text-white"
+              >
+                Home
+              </a>
+              <Link
+                to="/course"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >
+                Course
+              </Link>
+              <a
+                href="#team"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >
+                Team
+              </a>
+              <a
+                href="#faq"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >
+                FAQS
+              </a>
+              <a
+                href="#footer"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >
+                About
+              </a>
             </div>
             <div className="flex items-center space-x-2 md:space-x-4 z-10">
-              <Link
-                to="/login"
-                className="text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
-              >
-                Register/Login
-              </Link>
+              {session ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowProfile(!showProfile)}
+                    className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-bold uppercase"
+                  >
+                    {session.user.email?.charAt(0)}
+                  </button>
+
+                  {showProfile && (
+                    <div className="absolute right-0 mt-3 w-52 rounded-xl bg-white p-3 text-black shadow-xl">
+                      <p className="text-sm border-b pb-2 truncate">
+                        {session.user.email}
+                      </p>
+
+                      <button
+                        onClick={handleLogout}
+                        className="mt-2 w-full rounded-lg px-3 py-2 text-left hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
+                >
+                  Register/Login
+                </Link>
+              )}
               <Link to="/free-trial">
                 <Button
                   variant="outline"
@@ -372,10 +456,11 @@ export default function Home() {
           </div>
         </section>
 
-
-
         {/* features section Section */}
-        <section id="features" className="py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm">
+        <section
+          id="features"
+          className="py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm"
+        >
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <motion.div
@@ -436,7 +521,10 @@ export default function Home() {
         </section>
 
         {/* Gallery Section */}
-        <section id="gallery" className="py-24 relative overflow-hidden bg-black/2 border-b border-white/5 backdrop-blur-sm">
+        <section
+          id="gallery"
+          className="py-24 relative overflow-hidden bg-black/2 border-b border-white/5 backdrop-blur-sm"
+        >
           <div className="max-w-7xl mx-auto px-4">
             <div className="mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
@@ -498,10 +586,17 @@ export default function Home() {
         </section>
 
         {/* Review Section */}
-        <section id="review" className="py-24 relative overflow-hidden border-b border-white/5">
+        <section
+          id="review"
+          className="py-24 relative overflow-hidden border-b border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-4 mb-16">
-            <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">Student Review</span>
-            <h2 className="text-3xl md:text-5xl font-bold max-w-2xl">Confidence, not certainty. That's what a system gives you.</h2>
+            <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
+              Student Review
+            </span>
+            <h2 className="text-3xl md:text-5xl font-bold max-w-2xl">
+              Confidence, not certainty. That's what a system gives you.
+            </h2>
           </div>
 
           <div className="relative w-full overflow-hidden flex flex-col gap-6 py-4">
@@ -699,7 +794,10 @@ export default function Home() {
         </section>
 
         {/* Footer / Contact */}
-        <footer id="footer" className="bg-[#020703] border-t border-white/10 pt-16 pb-8">
+        <footer
+          id="footer"
+          className="bg-[#020703] border-t border-white/10 pt-16 pb-8"
+        >
           <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="text-2xl font-bold tracking-tighter mb-6">
@@ -751,10 +849,29 @@ export default function Home() {
             <div>
               <h4 className="font-bold mb-6 text-white">Company</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
-                <li><a href="#team" className="hover:text-primary transition-colors">Our Team</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
+                <li>
+                  <a href="#" className="hover:text-primary transition-colors">
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#team"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Our Team
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-primary transition-colors">
+                    Careers
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-primary transition-colors">
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
 
