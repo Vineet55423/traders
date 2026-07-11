@@ -43,13 +43,16 @@ export default function Register() {
 
     setLoading(false);
 
-    if (error) {
-      console.log(error);
-      alert(error.message);
+    if (error?.message === "User already registered") {
+      alert("This email is already registered. Please login.");
+      navigate("/login");
       return;
     }
 
-    alert("Registration successful! Please verify your email.");
+    await supabase.auth.signOut();
+
+    alert("Registration successful! Please login.");
+
     navigate("/login");
   };
 
