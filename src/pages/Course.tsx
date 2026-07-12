@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
 import { CheckCircle2, ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
 import { MobileMenu } from '../components/MobileMenu';
+import { courses } from '../data/courses';
 
 export default function Course() {
   return (
@@ -62,33 +63,7 @@ export default function Course() {
               </div>
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[
-                  {
-                    title: "SMC (Smart Money Concepts)",
-                    desc: "Trade the way institutions do — map liquidity, spot order blocks, and time entries around smart-money footprints instead of retail indicators.",
-                    features: ["Institutional Trading", "Liquidity Mapping", "Order Blocks", "High-Probability Entries"]
-                  },
-                  {
-                    title: "Price Action",
-                    desc: "Strip away the indicators and learn to read the chart itself — candle by candle, structure by structure.",
-                    features: ["Pure Chart Reading", "Candlestick Mastery", "Market Structure", "Precision Entries"]
-                  },
-                  {
-                    title: "Psychology of Market",
-                    desc: "The strategy is rarely the problem. Build the emotional discipline and decision-making habits that keep you consistent under pressure.",
-                    features: ["Emotional Discipline", "Trader Mindset", "Decision Making", "Consistent Performance"]
-                  },
-                  {
-                    title: "Risk Management",
-                    desc: "Protect your capital first, grow it second. Master position sizing and risk-to-reward so no single trade can hurt you.",
-                    features: ["Capital Protection", "Position Sizing", "Risk-to-Reward", "Loss Control"]
-                  },
-                  {
-                    title: "Advanced Concept (MSNR)",
-                    desc: "For traders ready to go beyond the basics — a multi-confirmation framework for precision execution in any market condition.",
-                    features: ["Advanced Market Analysis", "MSNR Strategy", "Multi-Confirmation Setup", "Precision Execution"]
-                  }
-                ].map((course, i) => (
+                {courses.map((course, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 30 }}
@@ -110,10 +85,12 @@ export default function Course() {
                           </li>
                         ))}
                       </ul>
-                      <Button className="w-full justify-between group mt-auto">
-                        Enroll Now
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </Button>
+                      <Link to={`/checkout/${course.id}`} className="mt-auto block">
+                        <Button className="w-full justify-between group">
+                          Enroll Now
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
                     </GlassCard>
                   </motion.div>
                 ))}

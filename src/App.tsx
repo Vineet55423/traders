@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Consultation from "./pages/Consultation";
 import FreeTrial from "./pages/FreeTrial";
 import Course from "./pages/Course";
+import Checkout from "./pages/Checkout";
 import ResetPassword from "./pages/ResetPassword";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -29,6 +30,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Course />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout/:courseId"
+          element={
+            <ProtectedRoute>
+              <Checkout />
             </ProtectedRoute>
           }
         />
