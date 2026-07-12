@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { UserProfile } from "../components/ui/UserProfile";
 import { HalftoneBackground } from "../components/ui/HalftoneBackground";
+import { isAdmin } from "../lib/admin";
 import logoi from "../assets/logoi.png";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -140,6 +141,14 @@ export default function Home() {
               >
                 Course
               </Link>
+              {session && isAdmin(session.user?.email) && (
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+                >
+                  Dashboard
+                </Link>
+              )}
               <a
                 href="#team"
                 className="text-sm font-medium text-white/67 hover:text-white transition-colors"
@@ -175,6 +184,7 @@ export default function Home() {
                 links={[
                   { label: "Home", to: "#home" },
                   { label: "Course", to: "/course" },
+                  ...(session && isAdmin(session.user?.email) ? [{ label: "Dashboard", to: "/dashboard" }] : []),
                   { label: "Team", to: "#team" },
                   { label: "FAQs", to: "#faq" },
                   { label: "About", to: "#footer" },

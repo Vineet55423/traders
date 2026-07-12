@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { UserProfile } from '../components/ui/UserProfile';
+import { isAdmin } from '../lib/admin';
 import logoi from '../assets/logoi.png';
 
 export default function Course() {
@@ -70,6 +71,14 @@ export default function Course() {
               >
                 Course
               </Link>
+              {session && isAdmin(session.user?.email) && (
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+                >
+                  Dashboard
+                </Link>
+              )}
               <Link
                 to="/#team"
                 className="text-sm font-medium text-white/67 hover:text-white transition-colors"
@@ -105,6 +114,7 @@ export default function Course() {
                 links={[
                   { label: "Home", to: "/#home" },
                   { label: "Course", to: "/course" },
+                  ...(session && isAdmin(session.user?.email) ? [{ label: "Dashboard", to: "/dashboard" }] : []),
                   { label: "Team", to: "/#team" },
                   { label: "FAQs", to: "/#faq" },
                   { label: "About", to: "/#footer" },

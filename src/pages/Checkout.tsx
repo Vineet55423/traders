@@ -79,7 +79,7 @@ export default function Checkout() {
             Welcome to {course.title}. You will receive an email shortly with your access details.
           </p>
           <Link to="/course">
-            <Button className="w-full">Go to Dashboard</Button>
+            <Button className="w-full">Go to Course</Button>
           </Link>
         </motion.div>
       </div>
