@@ -5,49 +5,119 @@ import { GlassCard } from '../components/ui/GlassCard';
 import { CheckCircle2, ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
 import { MobileMenu } from '../components/MobileMenu';
 import { courses } from '../data/courses';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { UserProfile } from '../components/ui/UserProfile';
+import logoi from '../assets/logoi.png';
 
 export default function Course() {
+  const navigate = useNavigate();
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+    };
+
+    getSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen text-foreground font-sans relative page-hero-bg">
       <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none"></div>
 
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 p-6 pt-8">
+        <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8">
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
-            <div className="flex items-center space-x-1 z-10">
-              <Link to="/" className="text-3xl font-serif text-white tracking-wide flex items-start">
-                T<span className="text-xl font-sans mt-0.5 ml-0.5">4</span>Trader
+            <div className="flex items-center z-10 -ml-22 md:-ml-32">
+              <Link to="/#home" className="flex items-center">
+                <img 
+                  src={logoi}
+                  alt="T4 Trader" 
+                  className="h-16 md:h-20 lg:h-24 w-auto object-contain transform origin-left"
+                />
               </Link>
             </div>
 
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-16 bg-white/10 backdrop-blur-md border border-white/10 px-12 py-2.5 rounded-full shadow-lg z-10">
-              <Link to="/" className="text-sm font-medium hover:text-white transition-colors text-white/70">Home</Link>
-              <Link to="/course" className="text-sm font-medium text-white hover:text-white transition-colors">Course</Link>
-              {/* <Link to="/#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">About</Link> */}
-              <Link to="/#faq" className="text-sm font-medium text-white/70 hover:text-white transition-colors">FAQs</Link>
-              <Link to="/#footer" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Contact</Link>
+              <Link
+                to="/#home"
+                className="text-sm font-medium hover:text-white transition-colors text-white"
+              >
+                Home
+              </Link>
+              <Link
+                to="/course"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+              >
+                Course
+              </Link>
+              <Link
+                to="/#team"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+              >
+                Team
+              </Link>
+              <Link
+                to="/#faq"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+              >
+                FAQS
+              </Link>
+              <Link
+                to="/#footer"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+              >
+                About
+              </Link>
             </div>
             <div className="flex items-center space-x-2 md:space-x-4 z-10">
-              <Link to="/login" className="hidden sm:inline-block text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg">Register/Login</Link>
-              <Link to="/free-trial">
-                <Button variant="outline" className="px-4 py-2 md:px-6 md:py-3 h-auto text-xs md:text-sm bg-transparent border-white/40 text-white hover:bg-white/10 rounded-full font-medium transition-colors">Free Trial</Button>
-              </Link>
-
-              <MobileMenu
-                links={[
-                  { label: "Home", to: "/" },
-                  { label: "Course", to: "/course" },
-                  { label: "FAQs", to: "/#faq" },
-                  { label: "Contact", to: "/#footer" },
-                ]}
-              >
+              {session ? (
+                <UserProfile session={session} handleLogout={handleLogout} />
+              ) : (
                 <Link
                   to="/login"
-                  className="sm:hidden text-center text-sm font-medium bg-white/5 border border-white/10 px-4 py-3 rounded-full text-white/80 hover:text-white transition-colors"
+                  className="hidden sm:inline-block text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
                 >
                   Register/Login
                 </Link>
+              )}
+
+              <MobileMenu
+                links={[
+                  { label: "Home", to: "/#home" },
+                  { label: "Course", to: "/course" },
+                  { label: "Team", to: "/#team" },
+                  { label: "FAQs", to: "/#faq" },
+                  { label: "About", to: "/#footer" },
+                ]}
+              >
+                {!session && (
+                  <Link
+                    to="/login"
+                    className="sm:hidden text-center text-sm font-medium bg-white/5 border border-white/10 px-4 py-3 rounded-full text-white/80 hover:text-white transition-colors"
+                  >
+                    Register/Login
+                  </Link>
+                )}
               </MobileMenu>
             </div>
           </div>
