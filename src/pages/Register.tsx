@@ -29,17 +29,27 @@ export default function Register() {
     setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password: password.trim(),
+      email,
+      password,
       options: {
         data: {
-          full_name: fullName.trim(),
+          full_name: fullName,
         },
+        emailRedirectTo: `${window.location.origin}`,
       },
     });
 
     console.log("DATA:", data);
-    console.log("ERROR:", error);
+
+    if (error) {
+      console.error("Full Error:", error);
+      console.error("Message:", error.message);
+      console.error("Status:", error.status);
+      console.error("Name:", error.name);
+      console.error("Code:", (error as any).code);
+    } else {
+      console.log("Signup Successful:", data);
+    }
 
     setLoading(false);
 

@@ -37,7 +37,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    const handleFocus = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setSession(session);
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("focus", handleFocus);
+    };
+    
   }, []);
 
   return (

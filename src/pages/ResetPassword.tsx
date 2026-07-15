@@ -32,6 +32,8 @@ export default function ResetPassword() {
 
     alert("Password updated successfully.");
 
+    await supabase.auth.signOut();
+
     navigate("/login");
   };
 

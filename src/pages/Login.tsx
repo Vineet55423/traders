@@ -20,7 +20,10 @@ export default function Login() {
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail);
+    // UPDATE THIS LINE: Add the redirectTo option
+    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo: "http://localhost:5173/reset-password",
+    });
 
     console.log("Reset Error:", error);
 
@@ -31,6 +34,30 @@ export default function Login() {
 
     alert("Password reset link sent.");
   };
+
+  // const handleForgotPassword = async () => {
+  //   const cleanEmail = email.trim().toLowerCase();
+
+  //   console.log("Reset Email:", cleanEmail);
+
+  //   if (!cleanEmail) {
+  //     alert("Please enter your email first.");
+  //     return;
+  //   }
+
+  //   const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+  //     redirectTo: `${window.location.origin}/reset-password`,
+  //   });
+
+  //   console.log("Reset Error:", error);
+
+  //   if (error) {
+  //     alert(error.message);
+  //     return;
+  //   }
+
+  //   alert("Password reset link sent.");
+  // };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
