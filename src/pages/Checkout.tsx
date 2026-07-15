@@ -9,8 +9,11 @@ import { courses, type Course } from "../data/courses";
 import { Button } from "../components/ui/Button";
 import { GlassCard } from "../components/ui/GlassCard";
 import { Input } from "../components/ui/Input";
+import { useAuth } from "../context/AuthContext";
+import { supabase } from "../lib/supabase";
 
 export default function Checkout() {
+  const { session } = useAuth();
   const { courseId } = useParams();
   const [course, setCourse] = useState<Course | null>(null);
   
@@ -53,9 +56,33 @@ export default function Checkout() {
 
   const finalPrice = Math.max(0, course.price - discount);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    if (!session) {
+      alert("Please log in to complete the purchase.");
+      return;
+    }
+    
     setIsProcessing(true);
-    // Simulate API call
+    
+    const { error } = await supabase
+      .from('transactions')
+      .insert({
+        user_id: session.user.id,
+        user_email: session.user.email,
+        course_id: course.id,
+        course_title: course.title,
+        amount: finalPrice,
+        status: 'Success'
+      });
+
+    if (error) {
+      console.error("Error inserting transaction:", error);
+      alert("There was an error processing your payment. Please try again.");
+      setIsProcessing(false);
+      return;
+    }
+
+    // Simulate API delay for UI effect
     setTimeout(() => {
       setIsProcessing(false);
       setIsSuccess(true);

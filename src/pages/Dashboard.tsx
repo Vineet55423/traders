@@ -1,4 +1,4 @@
-
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
@@ -9,8 +9,87 @@ import logoi from "../assets/logoi.png";
 import { Users, DollarSign, Activity, FileText } from "lucide-react";
 import { isAdmin } from "../lib/admin";
 
+interface Transaction {
+  id: string;
+  user_email: string;
+  course_title: string;
+  created_at: string;
+  amount: number;
+  status: string;
+}
+
 export default function Dashboard() {
   const { session } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [stats, setStats] = useState({
+    revenue: 0,
+    students: 0,
+    newRegistrations: 0,
+    coursesSold: 0
+  });
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error("Error fetching transactions:", error);
+        return;
+      }
+      
+      if (data) {
+        setTransactions(data);
+        
+        let totalRev = 0;
+        let successfulTx = 0;
+        const uniqueUsers = new Set();
+        
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        let newRegs = 0;
+
+        data.forEach((tx: any) => {
+          if (tx.status === 'Success') {
+            totalRev += Number(tx.amount);
+            successfulTx += 1;
+            uniqueUsers.add(tx.user_email);
+            
+            const txDate = new Date(tx.created_at);
+            if (txDate >= oneWeekAgo) {
+              newRegs += 1;
+            }
+          }
+        });
+
+        setStats({
+          revenue: totalRev,
+          students: uniqueUsers.size,
+          newRegistrations: newRegs,
+          coursesSold: successfulTx
+        });
+      }
+    };
+    
+    fetchTransactions();
+    
+    const channel = supabase
+      .channel('transactions_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transactions' },
+        () => {
+          fetchTransactions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -87,7 +166,7 @@ export default function Dashboard() {
                   <DollarSign className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white">₹1,24,500</div>
+              <div className="text-2xl sm:text-3xl font-bold text-white">₹{stats.revenue.toLocaleString('en-IN')}</div>
             </GlassCard>
             
             <GlassCard className="p-4 sm:p-6 bg-white/5 border-white/10 flex flex-col justify-between min-h-[8rem]">
@@ -97,7 +176,7 @@ export default function Dashboard() {
                   <Users className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white">342</div>
+              <div className="text-2xl sm:text-3xl font-bold text-white">{stats.students}</div>
             </GlassCard>
 
             <GlassCard className="p-4 sm:p-6 bg-white/5 border-white/10 flex flex-col justify-between min-h-[8rem]">
@@ -107,7 +186,7 @@ export default function Dashboard() {
                   <Activity className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white">+12</div>
+              <div className="text-2xl sm:text-3xl font-bold text-white">+{stats.newRegistrations}</div>
             </GlassCard>
 
             <GlassCard className="p-4 sm:p-6 bg-white/5 border-white/10 flex flex-col justify-between min-h-[8rem]">
@@ -117,7 +196,7 @@ export default function Dashboard() {
                   <FileText className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white">89</div>
+              <div className="text-2xl sm:text-3xl font-bold text-white">{stats.coursesSold}</div>
             </GlassCard>
           </div>
 
@@ -141,24 +220,30 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5 text-gray-300 text-xs sm:text-sm">
-                      {[
-                        { user: "johndoe@gmail.com", course: "SMC (Smart Money Concept)", date: "Today, 10:23 AM", amount: "₹30,000", status: "Success" },
-                        { user: "meera.s@yahoo.com", course: "Price Action", date: "Today, 09:15 AM", amount: "₹20,000", status: "Success" },
-                        { user: "rahul99@gmail.com", course: "Advanced Concept (MSNR)", date: "Yesterday, 04:30 PM", amount: "₹25,000", status: "Success" },
-                        { user: "karan.v@gmail.com", course: "Risk Management", date: "Yesterday, 11:20 AM", amount: "₹15,000", status: "Failed" },
-                      ].map((tx, i) => (
-                        <tr key={i} className="hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{tx.user}</td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap font-medium text-white">{tx.course}</td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-gray-500">{tx.date}</td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{tx.amount}</td>
+                      {transactions.length > 0 ? transactions.slice(0, 10).map((tx, i) => (
+                        <tr key={tx.id || i} className="hover:bg-white/5 transition-colors">
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{tx.user_email}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap font-medium text-white">{tx.course_title}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-gray-500">
+                            {new Date(tx.created_at).toLocaleDateString('en-IN', {
+                              day: 'numeric', month: 'short', year: 'numeric',
+                              hour: '2-digit', minute: '2-digit'
+                            })}
+                          </td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">₹{Number(tx.amount).toLocaleString('en-IN')}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.status === 'Success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                               {tx.status}
                             </span>
                           </td>
                         </tr>
-                      ))}
+                      )) : (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                            No transactions found.
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
