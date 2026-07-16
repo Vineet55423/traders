@@ -76,11 +76,14 @@ export default function Dashboard() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'transactions' },
-        () => {
+        (payload) => {
+          console.log("Realtime change received!", payload);
           fetchTransactions();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Supabase Realtime subscription status:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
