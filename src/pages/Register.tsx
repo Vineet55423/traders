@@ -61,7 +61,7 @@ export default function Register() {
 
     await supabase.auth.signOut();
 
-    alert("Registration successful! Please login.");
+    alert("Registration successful! Please check your email to verify your account before logging in.");
 
     navigate("/login");
   };

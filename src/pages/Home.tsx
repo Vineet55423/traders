@@ -119,9 +119,10 @@ export default function Home() {
 
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8">
+        <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8"> 
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
-            <div className="flex items-center z-10">
+            
+            <div className="flex items-center gap-3 mb-8">
               <a href="#home" className="flex items-center">
                 <img
                   src={logoi}
@@ -408,12 +409,12 @@ export default function Home() {
 
         {/* Method Section */}
         <section
-          id="section-5"
+          id="method"
           ref={methodRef}
-          className="py-6 md:py-24 relative border-b border-white/5 bg-[#040d06] z-10"
+          className="py-24 relative border-b border-white/5"
         >
-          <div className="max-w-7xl mx-auto px-6 md:px-10">
-            <div className="mb-6 md:mb-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 The framework
               </span>
@@ -428,7 +429,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div id="projectsContainer" className="projects-stack-container">
+            <div className="space-y-6">
               {[
                 {
                   num: "T1",
@@ -480,21 +481,18 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <div className="relative z-10 flex-1">
-                      <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full font-mono text-xs tracking-widest uppercase mb-5">
-                        {method.tag}
-                      </span>
+                  <div>
+                    <span className="text-primary font-mono text-xs tracking-widest uppercase mb-3 block">
+                      {method.tag}
+                    </span>
 
-                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-white leading-tight">
-                        {method.title}
-                      </h3>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                      {method.title}
+                    </h3>
 
-                      <p className="text-gray-400 text-base md:text-lg max-w-2xl leading-relaxed">
-                        {method.desc}
-                      </p>
-                    </div>
-                  </GlitchHoverCard>
-                </div>
+                    <p className="text-gray-400 max-w-xl">{method.desc}</p>
+                  </div>
+                </GlitchHoverCard>
               ))}
             </div>
           </div>
