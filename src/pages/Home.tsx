@@ -121,17 +121,17 @@ export default function Home() {
         {/* Navigation */}
         <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8">
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
-            <div className="flex items-center z-10 -ml-22 md:-ml-32">
+            <div className="flex items-center z-10">
               <a href="#home" className="flex items-center">
                 <img
                   src={logoi}
                   alt="T4 Trader"
-                  className="h-16 md:h-20 lg:h-24 w-auto object-contain transform origin-left"
+                  className="h-10 md:h-14 lg:h-16 w-auto object-contain transform origin-left"
                 />
               </a>
             </div>
 
-            <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-16 bg-white/10 backdrop-blur-md border border-white/10 px-12 py-2.5 rounded-full shadow-lg z-10">
+            <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-8 bg-white/10 backdrop-blur-md border border-white/10 px-8 py-2 rounded-full shadow-lg z-10">
               <a
                 href="#home"
                 className="text-sm font-medium hover:text-white transition-colors text-white"
@@ -171,7 +171,7 @@ export default function Home() {
               ) : (
                 <Link
                   to="/login"
-                  className="hidden sm:inline-block text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
+                  className="hidden sm:inline-block text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-3 py-1.5 md:px-5 md:py-2 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
                 >
                   Register/Login
                 </Link>
