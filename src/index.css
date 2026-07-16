@@ -33,6 +33,13 @@ html, body {
   width: 100%;
 }
 
+/* Apply 90% screen size on tablets, laptops, and PCs */
+@media (min-width: 768px) {
+  html {
+    zoom: 0.9;
+  }
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
