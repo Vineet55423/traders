@@ -1,4 +1,4 @@
-import React from "react";
+
 
 const NavbarSkeleton = () => (
   <div className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between border-b border-white/5 bg-black/40 backdrop-blur-md">
