@@ -34,7 +34,7 @@ export function MagneticIcon({ children, href }: { children: React.ReactNode; hr
       onMouseLeave={handleMouseLeave}
       animate={{ x: position.x, y: position.y }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-colors cursor-pointer block"
+      className="w-10 h-10 rounded-full bg-white/5 items-center justify-center hover:bg-primary/20 hover:text-primary transition-colors cursor-pointer block"
       style={{ display: 'flex' }}
     >
       {children}
