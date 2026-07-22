@@ -8,12 +8,18 @@ import {
   saveLocalSessionId,
 } from "../lib/session";
 
+// 1. Import the icons from lucide-react
+import { Eye, EyeOff } from "lucide-react"; 
+
 export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  // 2. Add the state to track password visibility
+  const [showPassword, setShowPassword] = useState(false); 
 
   const handleForgotPassword = async () => {
     const cleanEmail = email.trim().toLowerCase();
@@ -25,7 +31,6 @@ export default function Login() {
       return;
     }
 
-    // UPDATE THIS LINE: Add the redirectTo option
     const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
       redirectTo: "http://localhost:5173/reset-password",
     });
@@ -55,19 +60,12 @@ export default function Login() {
       password,
     });
 
-    console.log("Session Object:", data.session);
-    console.log("Session Keys:", Object.keys(data.session ?? {}));
-    console.log("Access Token:", data.session?.access_token);
-    console.log("Refresh Token:", data.session?.refresh_token);
-
     setLoading(false);
 
     if (error) {
       alert(error.message);
       return;
     }
-
-    console.log("Logged In User:", data.user);
 
     // Generate unique session id
     const sessionId = generateSessionId();
@@ -85,7 +83,6 @@ export default function Login() {
     }
 
     alert("Login Successful!");
-
     navigate("/");
   };
 
@@ -107,15 +104,30 @@ export default function Login() {
               placeholder="Enter your email"
             />
           </div>
+          
           <div>
             <label className="block text-sm text-gray-400 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-md px-4 py-2 text-white focus:outline-none focus:border-primary transition-colors"
-              placeholder="Enter your password"
-            />
+            
+            {/* 3. Wrap input and button in a relative div */}
+            <div className="relative">
+              <input
+                // 4. Dynamically change the type based on state
+                type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                // Added pr-10 so the text doesn't go behind the icon
+                className="w-full bg-white/5 border border-white/10 rounded-md px-4 py-2 pr-10 text-white focus:outline-none focus:border-primary transition-colors"
+                placeholder="Enter your password"
+              />
+              {/* 5. The absolute positioned toggle button */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <div className="text-right">
