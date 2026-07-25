@@ -7,7 +7,7 @@ import { MagneticIcon } from "../components/MagneticIcon";
 import { Navbar } from "../components/Navbar";
 import FrameworkSection from "../components/FrameworkSection";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -15,9 +15,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 console.log(supabase);
 
 export default function Home() {
-  // const methodRef = useRef<HTMLDivElement>(null);
-  // const [methodActive, setMethodActive] = useState(false);
-
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -64,9 +61,25 @@ export default function Home() {
     };
   }, []);
 
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+    }
+  }, [location]);
 
   useEffect(() => {
     const getSession = async () => {
@@ -87,24 +100,7 @@ export default function Home() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver(
-  //     ([entry]) => {
-  //       setMethodActive(entry.isIntersecting);
-  //     },
-  //     {
-  //       threshold: 0.4,
-  //     },
-  //   );
-
-  //   if (methodRef.current) {
-  //     observer.observe(methodRef.current);
-  //   }
-
-  //   return () => observer.disconnect();
-  // }, []);
-
-  const handleLogout = async () => {
+   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
   };
@@ -116,7 +112,7 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar session={session} handleLogout={handleLogout} isHome={true} />
 
-         {/* Hero Section */}
+        {/* Hero Section */}
         <section
           id="home"
           className="relative min-h-screen flex flex-col items-center justify-center pt-12 pb-8 md:pt-24 md:pb-32 overflow-hidden"
@@ -748,35 +744,6 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-
-            {/* <div>
-              <h4 className="font-bold mb-6 text-white">Company</h4>
-              <ul className="space-y-3 text-sm text-gray-500">
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#team"
-                    className="hover:text-primary transition-colors"
-                  >
-                    Our Team
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div> */}
 
             <div>
               <h4 className="font-bold mb-6 text-white">Contact Us</h4>

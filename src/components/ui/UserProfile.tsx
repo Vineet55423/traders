@@ -1,48 +1,70 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { User, Settings as SettingsIcon, Bell, LogOut, ChevronRight, X, Edit2 } from 'lucide-react';
-import type { Session } from '@supabase/supabase-js';
-import { supabase } from '../../lib/supabase';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  User,
+  Settings as SettingsIcon,
+  Bell,
+  LogOut,
+  ChevronRight,
+  X,
+  Edit2,
+} from "lucide-react";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "../../lib/supabase";
 
 interface UserProfileProps {
   session: Session;
   handleLogout: () => void;
 }
 
-export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout }) => {
+export const UserProfile: React.FC<UserProfileProps> = ({
+  session,
+  handleLogout,
+}) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [activeModal, setActiveModal] = useState<'none' | 'profile' | 'settings' | 'notifications'>('none');
+  const [activeModal, setActiveModal] = useState<
+    "none" | "profile" | "settings" | "notifications"
+  >("none");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Profile Form State
   const meta = session.user?.user_metadata || {};
-  const userEmail = session.user?.email || 'yourname@gmail.com';
-  
+  const userEmail = session.user?.email || "yourname@gmail.com";
+
   // Extract alphabetical prefix from email for default name
-  const emailPrefix = userEmail.split('@')[0];
-  const defaultNameFromEmail = emailPrefix.match(/^[a-zA-Z]+/)?.[0] || emailPrefix;
-  const formattedDefaultName = defaultNameFromEmail.charAt(0).toUpperCase() + defaultNameFromEmail.slice(1);
+  const emailPrefix = userEmail.split("@")[0];
+  const defaultNameFromEmail =
+    emailPrefix.match(/^[a-zA-Z]+/)?.[0] || emailPrefix;
+  const formattedDefaultName =
+    defaultNameFromEmail.charAt(0).toUpperCase() +
+    defaultNameFromEmail.slice(1);
 
   const [name, setName] = useState(meta.name || formattedDefaultName);
-  const [mobile, setMobile] = useState(meta.mobile || '');
-  const [location, setLocation] = useState(meta.location || '');
-  const [avatarData, setAvatarData] = useState(meta.avatar || '');
+  const [mobile, setMobile] = useState(meta.mobile || "");
+  const [location, setLocation] = useState(meta.location || "");
+  const [avatarData, setAvatarData] = useState(
+    meta.avatar || meta.avatar_url || meta.picture || "",
+  );
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Advanced Settings State
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(meta.two_factor_enabled || false);
-  const [currency, setCurrency] = useState(meta.currency || 'USD');
-  
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(
+    meta.two_factor_enabled || false,
+  );
+  const [currency, setCurrency] = useState(meta.currency || "USD");
+
   // Notification State
   const defaultNotifPrefs = {
     trade_alerts: true,
     market_news: false,
     mentorship: true,
-    promotions: false
+    promotions: false,
   };
-  const [notifPrefs, setNotifPrefs] = useState(meta.notification_prefs || defaultNotifPrefs);
+  const [notifPrefs, setNotifPrefs] = useState(
+    meta.notification_prefs || defaultNotifPrefs,
+  );
   const [isSavingPrefs, setIsSavingPrefs] = useState(false);
 
   // Handlers
@@ -54,7 +76,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
       if (error) alert("Error updating password: " + error.message);
       else {
         alert("Password updated successfully!");
-        setPassword('');
+        setPassword("");
       }
     } finally {
       setIsUpdatingPassword(false);
@@ -74,39 +96,47 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
   const handleSaveNotifPrefs = async () => {
     setIsSavingPrefs(true);
     try {
-      await supabase.auth.updateUser({ data: { notification_prefs: notifPrefs } });
+      await supabase.auth.updateUser({
+        data: { notification_prefs: notifPrefs },
+      });
       closeModal();
     } finally {
       setIsSavingPrefs(false);
     }
   };
   const userName = name; // Update username dynamically
-  const userInitials = userName.length > 0 ? userName.charAt(0).toUpperCase() : userEmail.charAt(0).toUpperCase();
+  const userInitials =
+    userName.length > 0
+      ? userName.charAt(0).toUpperCase()
+      : userEmail.charAt(0).toUpperCase();
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
 
     if (showDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showDropdown]);
 
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
-  const openModal = (modalName: 'profile' | 'settings' | 'notifications') => {
+  const openModal = (modalName: "profile" | "settings" | "notifications") => {
     setActiveModal(modalName);
     setShowDropdown(false); // Close dropdown when opening a modal
   };
 
-  const closeModal = () => setActiveModal('none');
+  const closeModal = () => setActiveModal("none");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,7 +146,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         const MAX_SIZE = 150;
         let width = img.width;
         let height = img.height;
@@ -134,11 +164,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
         }
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, width, height);
-        
+
         // compress to jpeg 0.7
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
         setAvatarData(dataUrl);
       };
       img.src = event.target?.result as string;
@@ -150,7 +180,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
     setIsSaving(true);
     try {
       const { error } = await supabase.auth.updateUser({
-        data: { name, mobile, location, avatar: avatarData }
+        data: { name, mobile, location, avatar: avatarData },
       });
       if (error) {
         alert("Error saving profile: " + error.message);
@@ -172,7 +202,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
         className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white text-black flex items-center justify-center font-bold uppercase shadow-lg border border-gray-200 overflow-hidden"
       >
         {avatarData ? (
-          <img src={avatarData} alt="Avatar" className="w-full h-full object-cover" />
+          <img
+            referrerPolicy="no-referrer"
+            src={avatarData}
+            alt="Avatar"
+            className="w-full h-full object-cover"
+          />
         ) : (
           <span className="text-lg">{userInitials}</span>
         )}
@@ -180,29 +215,36 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
 
       {/* 1. Dropdown Menu */}
       {showDropdown && (
-        <div 
+        <div
           ref={dropdownRef}
           className="absolute right-0 mt-3 w-[280px] sm:w-72 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-hidden"
         >
           {/* User Info Header */}
           <div className="p-5 flex items-center gap-4 border-b border-gray-100">
             <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600 text-xl shrink-0 overflow-hidden">
-               {avatarData ? (
-                 <img src={avatarData} alt="Avatar" className="w-full h-full object-cover" />
-               ) : (
-                 userInitials
-               )}
+              {avatarData ? (
+                <img
+                  referrerPolicy="no-referrer"
+                  src={avatarData}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                userInitials
+              )}
             </div>
             <div className="truncate">
-              <h4 className="font-semibold text-gray-900 text-sm truncate">{userName}</h4>
+              <h4 className="font-semibold text-gray-900 text-sm truncate">
+                {userName}
+              </h4>
               <p className="text-gray-500 text-xs truncate">{userEmail}</p>
             </div>
           </div>
 
           {/* Menu Items */}
           <div className="p-2">
-            <button 
-              onClick={() => openModal('profile')}
+            <button
+              onClick={() => openModal("profile")}
               className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors text-gray-700"
             >
               <div className="flex items-center gap-3">
@@ -212,8 +254,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
               <ChevronRight size={16} className="text-gray-400" />
             </button>
 
-            <button 
-              onClick={() => openModal('settings')}
+            <button
+              onClick={() => openModal("settings")}
               className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors text-gray-700"
             >
               <div className="flex items-center gap-3">
@@ -223,8 +265,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
               <ChevronRight size={16} className="text-gray-400" />
             </button>
 
-            <button 
-              onClick={() => openModal('notifications')}
+            <button
+              onClick={() => openModal("notifications")}
               className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors text-gray-700"
             >
               <div className="flex items-center gap-3">
@@ -234,7 +276,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
               <ChevronRight size={16} className="text-gray-400" />
             </button>
 
-            <button 
+            <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-gray-700 mt-1"
             >
@@ -246,14 +288,17 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
       )}
 
       {/* 2. Profile Modal */}
-      {activeModal === 'profile' && (
+      {activeModal === "profile" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal}></div>
-          
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={closeModal}
+          ></div>
+
           {/* Modal Content */}
           <div className="relative w-full max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto">
-            <button 
+            <button
               onClick={closeModal}
               className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors z-10"
             >
@@ -266,13 +311,24 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
                 <div className="relative">
                   <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600 text-3xl overflow-hidden border-2 border-white shadow-sm">
                     {avatarData ? (
-                      <img src={avatarData} alt="Avatar" className="w-full h-full object-cover" />
+                      <img
+                        referrerPolicy="no-referrer"
+                        src={avatarData}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       userInitials
                     )}
                   </div>
-                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-                  <button 
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     className="absolute bottom-0 right-0 p-1.5 bg-white border border-gray-200 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-50 shadow-sm transition-colors"
                   >
@@ -280,27 +336,35 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
                   </button>
                 </div>
                 <div className="mt-2 sm:mt-0">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{userName}</h3>
-                  <p className="text-gray-500 text-sm sm:text-base">{userEmail}</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+                    {userName}
+                  </h3>
+                  <p className="text-gray-500 text-sm sm:text-base">
+                    {userEmail}
+                  </p>
                 </div>
               </div>
 
               {/* Form Fields */}
               <div className="space-y-5 sm:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 border-b border-gray-50 pb-3 sm:pb-4">
-                  <span className="text-sm font-medium text-gray-500 sm:w-32 shrink-0">Name</span>
-                  <input 
-                    type="text" 
+                  <span className="text-sm font-medium text-gray-500 sm:w-32 shrink-0">
+                    Name
+                  </span>
+                  <input
+                    type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full text-left sm:text-right text-gray-900 text-base sm:text-sm focus:outline-none bg-transparent"
                   />
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 border-b border-gray-50 pb-3 sm:pb-4">
-                  <span className="text-sm font-medium text-gray-500 sm:w-32 shrink-0">Email account</span>
-                  <input 
-                    type="text" 
+                  <span className="text-sm font-medium text-gray-500 sm:w-32 shrink-0">
+                    Email account
+                  </span>
+                  <input
+                    type="text"
                     value={userEmail}
                     readOnly
                     className="w-full text-left sm:text-right text-gray-900 text-base sm:text-sm focus:outline-none bg-transparent"
@@ -309,10 +373,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 border-b border-gray-50 pb-3 sm:pb-4">
                   <span className="text-sm font-medium text-gray-500 sm:w-48 shrink-0">
-                    Mobile number <span className="text-xs text-gray-400 font-normal ml-1">(Optional)</span>
+                    Mobile number{" "}
+                    <span className="text-xs text-gray-400 font-normal ml-1">
+                      (Optional)
+                    </span>
                   </span>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value)}
                     placeholder="Add number"
@@ -321,10 +388,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 pb-3 sm:pb-4">
-                  <span className="text-sm font-medium text-gray-500 sm:w-32 shrink-0">Location</span>
+                  <span className="text-sm font-medium text-gray-500 sm:w-32 shrink-0">
+                    Location
+                  </span>
                   <div className="w-full">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       list="locations-list"
                       placeholder="Search location..."
                       value={location}
@@ -348,12 +417,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
 
               {/* Action Button */}
               <div className="mt-8">
-                <button 
+                <button
                   onClick={handleSaveProfile}
                   disabled={isSaving}
                   className="bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm py-2.5 px-6 rounded-lg transition-colors shadow-sm disabled:opacity-50"
                 >
-                  {isSaving ? 'Saving...' : 'Save Change'}
+                  {isSaving ? "Saving..." : "Save Change"}
                 </button>
               </div>
             </div>
@@ -362,14 +431,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
       )}
 
       {/* 3. Settings Modal */}
-      {activeModal === 'settings' && (
+      {activeModal === "settings" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal}></div>
-          
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={closeModal}
+          ></div>
+
           <div className="relative w-full max-w-md bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-xl font-bold text-gray-900">Settings</h3>
-              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+              <button
+                onClick={closeModal}
+                className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -377,44 +452,54 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
             <div className="p-6 overflow-y-auto space-y-8">
               {/* Security Section */}
               <section>
-                <h4 className="text-xs font-bold tracking-wider text-gray-400 uppercase mb-4">Security</h4>
+                <h4 className="text-xs font-bold tracking-wider text-gray-400 uppercase mb-4">
+                  Security
+                </h4>
                 <div className="space-y-4">
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Change Password</p>
-                        <p className="text-xs text-gray-500">Update your account password</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          Change Password
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Update your account password
+                        </p>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <input 
-                        type="password" 
-                        placeholder="New Password" 
+                      <input
+                        type="password"
+                        placeholder="New Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                       />
-                      <button 
+                      <button
                         onClick={handleUpdatePassword}
                         disabled={isUpdatingPassword || !password}
                         className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-xs font-medium rounded-lg transition-colors"
                       >
-                        {isUpdatingPassword ? 'Updating...' : 'Update'}
+                        {isUpdatingPassword ? "Updating..." : "Update"}
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Two-Factor Auth</p>
-                      <p className="text-xs text-gray-500">Add an extra layer of security</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        Two-Factor Auth
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Add an extra layer of security
+                      </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={twoFactorEnabled} 
+                      <input
+                        type="checkbox"
+                        checked={twoFactorEnabled}
                         onChange={(e) => handleToggle2FA(e.target.checked)}
-                        className="sr-only peer" 
+                        className="sr-only peer"
                       />
                       <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
                     </label>
@@ -424,14 +509,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
 
               {/* Preferences Section */}
               <section>
-                <h4 className="text-xs font-bold tracking-wider text-gray-400 uppercase mb-4">Preferences</h4>
+                <h4 className="text-xs font-bold tracking-wider text-gray-400 uppercase mb-4">
+                  Preferences
+                </h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Currency</p>
-                      <p className="text-xs text-gray-500">Base display currency</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        Currency
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Base display currency
+                      </p>
                     </div>
-                    <select 
+                    <select
                       value={currency}
                       onChange={(e) => handleCurrencyChange(e.target.value)}
                       className="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -448,50 +539,86 @@ export const UserProfile: React.FC<UserProfileProps> = ({ session, handleLogout 
       )}
 
       {/* 4. Notifications Modal */}
-      {activeModal === 'notifications' && (
+      {activeModal === "notifications" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal}></div>
-          
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={closeModal}
+          ></div>
+
           <div className="relative w-full max-w-md bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h3 className="text-xl font-bold text-gray-900">Notification Preferences</h3>
-              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+              <h3 className="text-xl font-bold text-gray-900">
+                Notification Preferences
+              </h3>
+              <button
+                onClick={closeModal}
+                className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="p-6 overflow-y-auto space-y-6">
               {[
-                { id: 'trade_alerts', title: "Trade Execution Alerts", desc: "Get notified when a live trade setup is shared." },
-                { id: 'market_news', title: "Market News & Updates", desc: "Daily market recaps and breaking news alerts." },
-                { id: 'mentorship', title: "Mentorship Reminders", desc: "Alerts for upcoming live sessions and Q&As." },
-                { id: 'promotions', title: "Promotions & Offers", desc: "Updates on new courses and special discounts." }
+                {
+                  id: "trade_alerts",
+                  title: "Trade Execution Alerts",
+                  desc: "Get notified when a live trade setup is shared.",
+                },
+                {
+                  id: "market_news",
+                  title: "Market News & Updates",
+                  desc: "Daily market recaps and breaking news alerts.",
+                },
+                {
+                  id: "mentorship",
+                  title: "Mentorship Reminders",
+                  desc: "Alerts for upcoming live sessions and Q&As.",
+                },
+                {
+                  id: "promotions",
+                  title: "Promotions & Offers",
+                  desc: "Updates on new courses and special discounts.",
+                },
               ].map((item) => (
-                <div key={item.id} className="flex items-start justify-between gap-4">
+                <div
+                  key={item.id}
+                  className="flex items-start justify-between gap-4"
+                >
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 mb-1">{item.title}</p>
-                    <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                    <p className="text-sm font-semibold text-gray-900 mb-1">
+                      {item.title}
+                    </p>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      {item.desc}
+                    </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-                    <input 
-                      type="checkbox" 
-                      checked={notifPrefs[item.id as keyof typeof notifPrefs]} 
-                      onChange={(e) => setNotifPrefs({ ...notifPrefs, [item.id]: e.target.checked })}
-                      className="sr-only peer" 
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs[item.id as keyof typeof notifPrefs]}
+                      onChange={(e) =>
+                        setNotifPrefs({
+                          ...notifPrefs,
+                          [item.id]: e.target.checked,
+                        })
+                      }
+                      className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                   </label>
                 </div>
               ))}
             </div>
-            
+
             <div className="p-6 border-t border-gray-50 bg-gray-50/50">
-              <button 
-                onClick={handleSaveNotifPrefs} 
+              <button
+                onClick={handleSaveNotifPrefs}
                 disabled={isSavingPrefs}
                 className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-medium text-sm py-2.5 rounded-xl transition-colors shadow-sm"
               >
-                {isSavingPrefs ? 'Saving...' : 'Save Preferences'}
+                {isSavingPrefs ? "Saving..." : "Save Preferences"}
               </button>
             </div>
           </div>

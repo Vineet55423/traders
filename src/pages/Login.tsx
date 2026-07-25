@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Button } from "../components/ui/Button";
 import { supabase } from "../lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -150,10 +151,17 @@ export default function Login() {
             </button>
           </div>
 
-          <Button type="submit" className="w-full mt-6" disabled={loading}>
+         <Button type="submit" className="w-full mt-6" disabled={loading}>
             {loading ? "Logging In..." : "Login"}
           </Button>
         </form>
+
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-gray-500">OR</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+        <GoogleAuthButton />
 
         <p className="text-center text-sm text-gray-400 mt-6">
           Don't have an account?{" "}

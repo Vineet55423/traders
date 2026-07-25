@@ -4,6 +4,7 @@ import { Button } from "../components/ui/Button";
 import { supabase } from "../lib/supabase";
 // 1. Import the icons from lucide-react
 import { Eye, EyeOff } from "lucide-react";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // 2. Add the state to track password visibility
   const [showPassword, setShowPassword] = useState(false);
 
@@ -59,7 +60,9 @@ export default function Register() {
 
     await supabase.auth.signOut();
 
-    alert("Registration successful! Please check your email to verify your account before logging in.");
+    alert(
+      "Registration successful! Please check your email to verify your account before logging in.",
+    );
     navigate("/login");
   };
 
@@ -93,7 +96,7 @@ export default function Register() {
               placeholder="Enter your email"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm text-gray-400 mb-1">Password</label>
             {/* 3. Wrap input and button in a relative div */}
@@ -122,6 +125,14 @@ export default function Register() {
             {loading ? "Creating Account..." : "Register"}
           </Button>
         </form>
+
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-gray-500">OR</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+        <GoogleAuthButton />
+
         <p className="text-center text-sm text-gray-400 mt-6">
           Already have an account?{" "}
           <Link to="/login" className="text-primary hover:underline">

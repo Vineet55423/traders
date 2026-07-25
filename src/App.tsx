@@ -15,6 +15,7 @@ const Course = React.lazy(() => import("./pages/Course"));
 const Checkout = React.lazy(() => import("./pages/Checkout"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const ResetPassword = React.lazy(() => import("./pages/ResetPassword"));
+const AuthCallback = React.lazy(() => import("./pages/AuthCallback"));
 import { Toaster } from "react-hot-toast";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -26,7 +27,6 @@ function App() {
       <Suspense fallback={null}>
         <Routes>
           {/* Public Routes */}
-
           <Route
             path="/"
             element={
@@ -37,11 +37,10 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/consultation" element={<Consultation />} />
           <Route path="/free-trial" element={<FreeTrial />} />
-
           {/* Protected Route */}
-
           <Route
             path="/course"
             element={
